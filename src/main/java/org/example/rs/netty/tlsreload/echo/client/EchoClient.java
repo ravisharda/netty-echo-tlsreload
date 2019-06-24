@@ -6,10 +6,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.ssl.SslContext;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.shared.Config;
-import org.example.rs.netty.tlsreload.echo.shared.SslContextHelper;
 
 @Slf4j
 public class EchoClient {

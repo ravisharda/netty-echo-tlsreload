@@ -6,8 +6,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.common.FileChangeWatcherService;
 import org.example.rs.netty.tlsreload.echo.shared.Config;

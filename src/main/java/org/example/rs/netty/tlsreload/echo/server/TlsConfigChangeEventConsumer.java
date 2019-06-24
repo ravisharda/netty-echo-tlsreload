@@ -2,7 +2,7 @@ package org.example.rs.netty.tlsreload.echo.server;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.socket.SocketChannel;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

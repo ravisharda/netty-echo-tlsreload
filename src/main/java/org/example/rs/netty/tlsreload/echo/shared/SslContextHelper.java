@@ -10,8 +10,6 @@ import javax.net.ssl.SSLException;
 import java.io.File;
 import java.security.cert.CertificateException;
 
-import static org.example.rs.netty.tlsreload.echo.common.FileUtils.absolutePathOfFileInClasspath;
-
 @Slf4j
 public class SslContextHelper {
 
