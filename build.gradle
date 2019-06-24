@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example.rs.netty.tlsreload.echo'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+allprojects {
+    apply plugin: "idea"
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    testCompile "junit:junit:${junitVersion}"
+
+    // For logging
+    compile "org.slf4j:slf4j-api:${slf4jApiVersion}"
+    compile "ch.qos.logback:logback-classic:${logbackVersion}"
+    compile "io.netty:netty-all:${nettyVersion}"
+    // compile group: 'commons-io', name: 'commons-io', version: '2.6'
+}
