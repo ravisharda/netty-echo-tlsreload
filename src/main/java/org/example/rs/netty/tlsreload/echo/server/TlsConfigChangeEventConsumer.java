@@ -6,7 +6,7 @@ import io.netty.channel.ChannelPipeline;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.rs.netty.tlsreload.echo.shared.Config;
+import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
 import org.example.rs.netty.tlsreload.echo.shared.SslContextHelper;
 
 import javax.net.ssl.SSLException;
@@ -25,6 +25,7 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
 
     private @NonNull ChannelPipeline pipeline;
     private @NonNull ByteBufAllocator byteBufferAllocator;
+    private @NonNull ServerConfig config;
 
     @Override
     public void accept(WatchEvent<?> watchEvent) {
@@ -37,8 +38,7 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
         log.info("Pipeline inside the callback: [{}].", pipeline);
         try {
             pipeline.replace("ssl",
-                    "ssl", SslContextHelper.createServerSslContext(Config.ENABLE_TLS,
-                            Config.USE_SUPPLIED_TLS_MATERIAL, Config.SERVER_CERT, Config.SERVER_KEY)
+                    "ssl", SslContextHelper.createServerSslContext(config)
                             .newHandler(byteBufferAllocator));
             log.info("Done replacing SSL Context handler.");
         }  catch (CertificateException | SSLException e) {

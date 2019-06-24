@@ -13,39 +13,37 @@ import java.security.cert.CertificateException;
 @Slf4j
 public class SslContextHelper {
 
-    public static SslContext createServerSslContext(boolean enableTls, boolean useSuppliedTlsMaterial,
-                                                    String serverCertificatePath, String serverKeyPath) throws CertificateException, SSLException {
+    public static SslContext createServerSslContext(ServerConfig config) throws CertificateException, SSLException {
         SslContext result = null;
 
-        if (enableTls) {
+        if (config.isTlsEnabled()) {
             log.trace("Creating an SSL Context.");
-            if (useSuppliedTlsMaterial) {
-                result = SslContextBuilder.forServer(
-                        new File(serverCertificatePath),
-                        new File(serverKeyPath)).build();
-                log.debug("Done creating SSL Context using pre-created material");
-            } else {
+            if (config.isUseSelfSignedTlsMaterial()) {
                 SelfSignedCertificate ssc = new SelfSignedCertificate();
                 result = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-                log.debug("Done creating SSL Context using self-signed material");
+                log.debug("Done creating SSL Context using auto-generated self-signed material");
+            } else {
+                result = SslContextBuilder.forServer(
+                        new File(config.getCertificatePath()),
+                        new File(config.getKeyPath())).build();
+                log.debug("Done creating SSL Context using supplied material");
             }
         }
         return result;
     }
 
-    public static SslContext createClientSslContext(boolean enableTls, boolean useSuppliedTlsMaterial,
-                                                    String caCertificatePath) throws SSLException {
+    public static SslContext createClientSslContext(ClientConfig config) throws SSLException {
         final SslContext sslCtx;
-        if (Config.ENABLE_TLS) {
+        if (config.isEnableTls()) {
             log.debug("Creating an SSL Context...");
-            if (Config.USE_SUPPLIED_TLS_MATERIAL) {
-                sslCtx = SslContextBuilder.forClient()
-                        .trustManager(new File(caCertificatePath)).build();
-                log.debug("Done creating SSL Context using pre-created material");
-            } else {
+            if (config.isUseSelfSignedTlsMaterial()) {
                 sslCtx = SslContextBuilder.forClient()
                         .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-                log.debug("Done creating SSL Context using self-signed material");
+                log.debug("Done creating SSL Context using auto-generated self-signed material");
+           } else {
+                sslCtx = SslContextBuilder.forClient()
+                        .trustManager(new File(config.getTrustedCertficatePath())).build();
+                log.debug("Done creating SSL Context using supplied material");
             }
         } else {
             sslCtx = null;

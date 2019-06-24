@@ -7,32 +7,67 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.example.rs.netty.tlsreload.echo.shared.Config;
+import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
+
+import javax.net.ssl.SSLException;
 
 @Slf4j
-public class EchoClient {
+public class EchoClient implements AutoCloseable {
 
-    public static void main(String[] args) throws Exception {
+    private final ClientConfig config;
+
+    private EventLoopGroup group;
+
+    public EchoClient() {
+        // Use the default config.
+        this(ClientConfig.builder().build());
+    }
+
+    public EchoClient(ClientConfig config) {
+        this.config = config;
+        log.info(this.config.toString());
+    }
+
+    public void start() throws InterruptedException, SSLException {
         // Configure the client.
-        EventLoopGroup group = new NioEventLoopGroup();
+        group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
             log.debug("Done creating client bootstrap");
             b.group(group)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.TCP_NODELAY, true)
-                    .handler(new EchoClientInitializer(Config.SERVER_HOST, Config.SERVER_PORT));
+                    .handler(new EchoClientInitializer(config));
 
             // Start the client.
-            ChannelFuture f = b.connect(Config.SERVER_HOST, Config.SERVER_PORT).sync();
+            ChannelFuture f = b.connect(config.getServerHost(), config.getServerPort()).sync();
             log.trace("Done starting the client to connect to server at host {} and port {}",
-                    Config.SERVER_HOST, Config.SERVER_PORT);
+                    config.getServerHost(), config.getServerPort());
 
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
         } finally {
-            log.debug("Shutting down client event loop");
+            close();
+        }
+    }
 
+    public static void main(String[] args) throws SSLException, InterruptedException {
+        ClientConfig config = ClientConfig.builder()
+                .enableTls(true)
+                .useSelfSignedTlsMaterial(false)
+                .serverHost("localhost")
+                .serverPort(8889)
+                .trustedCertficatePath("C:\\Workspace\\pki\\test\\ca-cert.crt").build();
+
+        EchoClient client = new EchoClient(config);
+        client.start();
+    }
+
+    @Override
+    public void close() {
+        log.debug("Shutting down client event loop");
+
+        if (!group.isShutdown()) {
             // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
         }

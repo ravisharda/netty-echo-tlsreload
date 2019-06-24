@@ -36,12 +36,12 @@
 
     <logger name="org.example.rs.netty.tlsreload.echo.client" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE-CLIENT"/>
+        <!--<appender-ref ref="FILE-CLIENT"/>-->
     </logger>
 
     <logger name="org.example.rs.netty.tlsreload.echo" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE-SERVER"/>
+        <!--<appender-ref ref="FILE-SERVER"/>-->
     </logger>
 
     <logger name="io.netty" level="INFO"/>
