@@ -16,9 +16,14 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private SslContext sslCtx;
 
+    /**
+     * This method is called once when the Channel is registered.
+     * @param ch
+     * @throws Exception
+     */
     @Override
     public void initChannel(final SocketChannel ch) throws Exception {
-        log.trace("initializing channel");
+        log.info("Initializing channel");
         final ChannelPipeline pipeline = ch.pipeline();
 
         sslCtx = SslContextHelper.createServerSslContext(Config.ENABLE_TLS, Config.USE_SUPPLIED_TLS_MATERIAL,
@@ -26,14 +31,12 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
 
         if (sslCtx != null) {
             pipeline.addLast("ssl", sslCtx.newHandler(ch.alloc()));
-            log.debug("Done adding SSL Context handler to the pipeline.");
+            log.info("Done adding SSL Context handler to the pipeline.");
         }
-        pipeline.addLast("logging", new LoggingHandler(LogLevel.INFO));
+        //pipeline.addLast("logging", new LoggingHandler(LogLevel.INFO));
         pipeline.addLast("app", new EchoServerHandler()); // business logic handler.
-        log.debug("Done adding App handler to the pipeline.");
-
-        log.debug("ssl handler is present {}", pipeline.get("ssl") != null ? true : false);
-        log.debug(pipeline.toString());
+        log.info("Done adding App handler to the pipeline.");
+        log.info(pipeline.toString());
 
         FileChangeWatcherService fileWatcher = new FileChangeWatcherService(Config.SERVER_CERT,
                 new TlsConfigChangeEventConsumer(pipeline, ch.alloc()));

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
 
+    <!-- Insert the current time formatted as "yyyyMMdd'T'HHmmss" under
+    the key "bySecond" into the logger context. This value will be
+    available to all subsequent configuration elements. -->
+    <timestamp key="bySecond" datePattern="HHmmss-yyyyMMdd"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <charset>UTF-8</charset>
@@ -8,15 +13,37 @@
         </encoder>
     </appender>
 
+    <!-- Creates a new file for each run. -->
+    <appender name="FILE-SERVER" class="ch.qos.logback.core.FileAppender">
+        <file>logs/${bySecond}-server.log</file>
+        <append>true</append>
+        <encoder>
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE-CLIENT" class="ch.qos.logback.core.FileAppender">
+        <file>logs/${bySecond}-client.log</file>
+        <append>true</append>
+        <encoder>
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M\(%line\) - %msg%n</Pattern>
+        </encoder>
+    </appender>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="org.example.rs.netty.tlsreload.echo" level="TRACE" additivity="false">
+    <logger name="org.example.rs.netty.tlsreload.echo.client" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT"/>
-    </logger>-
+        <appender-ref ref="FILE-CLIENT"/>
+    </logger>
 
-    <logger name="io.netty" level="ERROR"/>
+    <logger name="org.example.rs.netty.tlsreload.echo" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE-SERVER"/>
+    </logger>
+
+    <logger name="io.netty" level="INFO"/>
 
 </configuration>

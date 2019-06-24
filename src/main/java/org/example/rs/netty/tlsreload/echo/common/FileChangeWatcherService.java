@@ -4,7 +4,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.function.Consumer;
 
 /**
@@ -79,10 +85,7 @@ public class FileChangeWatcherService extends Thread {
                             .stream()
                             .filter(event -> // we only care about changes to the specified file.
                                     event.context().toString().contains(fileName))
-                            .forEach(event -> { // invoke the specified callback
-                                log.debug(event.context().toString());
-                                callback.accept(event);
-                            });
+                            .forEach(event ->  callback.accept(event)); // invoke the specified callback
                 }
 
                 boolean isKeyValid = watchKey.reset();

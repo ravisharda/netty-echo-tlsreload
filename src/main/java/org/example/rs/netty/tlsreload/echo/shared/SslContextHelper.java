@@ -18,7 +18,7 @@ public class SslContextHelper {
         SslContext result = null;
 
         if (enableTls) {
-            log.debug("Creating an SSL Context.");
+            log.trace("Creating an SSL Context.");
             if (useSuppliedTlsMaterial) {
                 result = SslContextBuilder.forServer(
                         new File(serverCertificatePath),

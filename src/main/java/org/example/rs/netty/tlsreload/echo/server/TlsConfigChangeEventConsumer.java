@@ -28,12 +28,13 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
 
     @Override
     public void accept(WatchEvent<?> watchEvent) {
+        log.debug("Invoked for [{}]", watchEvent.context().toString());
         handleTlsConfigChange();
     }
 
     private void handleTlsConfigChange() {
-        log.debug("Current reload count = {}", countOfEventsConsumed.incrementAndGet());
-        log.debug("Pipeline inside the callback: [{}].", pipeline);
+        log.info("Current reload count = {}", countOfEventsConsumed.incrementAndGet());
+        log.info("Pipeline inside the callback: [{}].", pipeline);
         try {
             pipeline.replace("ssl",
                     "ssl", SslContextHelper.createServerSslContext(Config.ENABLE_TLS,

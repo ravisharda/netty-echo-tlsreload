@@ -25,16 +25,16 @@ public final class EchoServer {
 
         try {
             // Configure the server
-            ServerBootstrap b = new ServerBootstrap();
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
             log.debug("Done creating server bootstrap");
-            b.group(bossGroup, workerGroup)
+            serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 100)
-                    .handler(new LoggingHandler(LogLevel.DEBUG))
+                    //.handler(new LoggingHandler(LogLevel.DEBUG))
                     .childHandler(new EchoServerInitializer());
 
             // Start the server
-            ChannelFuture f = b.bind(Config.SERVER_PORT).sync();
+            ChannelFuture f = serverBootstrap.bind(Config.SERVER_PORT).sync();
             log.info("Server started");
 
             // Wait until the server socket is closed
