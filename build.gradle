@@ -16,15 +16,28 @@ allprojects {
     apply plugin: "idea"
 }
 
+apply plugin: 'checkstyle'
+
+checkstyle {
+    toolVersion '7.8.1'
+    //configFile file("src/checkstyle.xml")
+}
+checkstyleMain {
+    source ='src/main/java'
+}
+checkstyleTest {
+    source ='src/test/java'
+}
+
 dependencies {
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testCompile "junit:junit:${junitVersion}"
+    testCompile "com.google.guava:guava:${guavaVersion}"
 
     // For logging
     compile "org.slf4j:slf4j-api:${slf4jApiVersion}"
     compile "ch.qos.logback:logback-classic:${logbackVersion}"
     compile "io.netty:netty-all:${nettyVersion}"
-    // compile group: 'commons-io', name: 'commons-io', version: '2.6'
 }
