@@ -3,6 +3,7 @@ package org.example.rs.netty.tlsreload.echo.shared;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.example.rs.netty.tlsreload.echo.common.FileUtils;
 
 @Getter
 @Builder
@@ -19,10 +20,10 @@ public class ServerConfig {
     private boolean useSelfSignedTlsMaterial = false;
 
     @Builder.Default
-    private String certificatePath = null;
+    private String certificatePath = FileUtils.pathOfFileInClasspath("server-cert.crt").toString();
 
     @Builder.Default
-    private String keyPath = null;
+    private String keyPath = FileUtils.pathOfFileInClasspath("server-key.key").toString();
 
     @Builder.Default
     private boolean loggingHandlerEnabled = false;

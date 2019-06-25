@@ -8,6 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.common.FileChangeWatcherService;
+import org.example.rs.netty.tlsreload.echo.common.FileUtils;
 import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
 
 /**
@@ -25,26 +26,9 @@ public final class EchoServer extends Thread {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    public EchoServer() {
-        // Use the default config.
-        this(ServerConfig.builder().build());
-    }
-
     public EchoServer(ServerConfig config) {
         this.serverConfig = config;
         log.info(this.serverConfig.toString());
-    }
-
-    public static void main(String... args) {
-        ServerConfig config = ServerConfig.builder()
-                .port(8889)
-                .tlsEnabled(true)
-                .useSelfSignedTlsMaterial(false)
-                .certificatePath("C:\\Workspace\\pki\\test\\server-cert.crt")
-                .keyPath("C:\\Workspace\\pki\\test\\server-key.key").build();
-
-        EchoServer server = new EchoServer(config);
-        server.start();
     }
 
     public void close() {
@@ -80,7 +64,7 @@ public final class EchoServer extends Thread {
             log.info("Server started");
 
             if (serverConfig.isTlsEnabled() && !serverConfig.isUseSelfSignedTlsMaterial()) {
-                // log.debug("channel: {}", ch.toString());
+                // Register a file watcher
                 FileChangeWatcherService fileWatcher = new FileChangeWatcherService(
                         serverConfig.getCertificatePath(),
                         new TlsConfigChangeEventConsumer(serverConfig));
@@ -96,5 +80,17 @@ public final class EchoServer extends Thread {
         } finally {
             close();
         }
+    }
+
+    public static void main(String... args) {
+        ServerConfig config = ServerConfig.builder()
+                .port(8889)
+                .tlsEnabled(true)
+                .useSelfSignedTlsMaterial(false)
+                .certificatePath(FileUtils.pathOfFileInClasspath("server-cert.crt").toString())
+                .keyPath(FileUtils.pathOfFileInClasspath("server-key.key").toString())
+                .build();
+        EchoServer server = new EchoServer(config);
+        server.start();
     }
 }

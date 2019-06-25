@@ -19,10 +19,6 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
     @NonNull
     private final ServerConfig config;
 
-    private SslContext sslCtx;
-
-
-
     /**
      * This method is called once when the Channel is registered.
      *
@@ -35,7 +31,7 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
         Channels.add(ch);
 
         final ChannelPipeline pipeline = ch.pipeline();
-        sslCtx = SslContextHelper.createServerSslContext(config);
+        SslContext sslCtx = SslContextHelper.createServerSslContext(config);
         if (sslCtx != null) {
             pipeline.addLast("ssl", sslCtx.newHandler(ch.alloc()));
             log.info("Done adding SSL Context handler to the pipeline.");

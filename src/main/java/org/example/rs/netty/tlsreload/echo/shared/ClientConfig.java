@@ -3,6 +3,7 @@ package org.example.rs.netty.tlsreload.echo.shared;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import org.example.rs.netty.tlsreload.echo.common.FileUtils;
 
 @Getter
 @Builder
@@ -19,7 +20,7 @@ public class ClientConfig {
      * Usually, the CA certificate that is used to sign the server certificates.
      */
     @Builder.Default
-    private String trustedCertficatePath = null;
+    private String trustedCertficatePath = FileUtils.pathOfFileInClasspath("ca-cert.crt").toString();
 
     @Builder.Default
     private boolean enableTls = true;

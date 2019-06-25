@@ -20,11 +20,6 @@ public class EchoClient implements AutoCloseable {
 
     private EventLoopGroup group;
 
-    public EchoClient() {
-        // Use the default config.
-        this(ClientConfig.builder().build());
-    }
-
     public EchoClient(ClientConfig config) {
         this.config = config;
         log.info(this.config.toString());
@@ -67,18 +62,6 @@ public class EchoClient implements AutoCloseable {
         }
     }
 
-    public static void main(String[] args) throws SSLException, InterruptedException, ExecutionException {
-        ClientConfig config = ClientConfig.builder()
-                .enableTls(true)
-                .useSelfSignedTlsMaterial(false)
-                .serverHost("localhost")
-                .serverPort(8889)
-                .trustedCertficatePath("C:\\Workspace\\pki\\test\\ca-cert.crt").build();
-
-        EchoClient client = new EchoClient(config);
-        client.start();
-    }
-
     @Override
     public void close() {
         log.debug("Shutting down client event loop");
@@ -87,5 +70,17 @@ public class EchoClient implements AutoCloseable {
             // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
         }
+    }
+
+    public static void main(String[] args) throws SSLException, InterruptedException, ExecutionException {
+        ClientConfig config = ClientConfig.builder()
+                .enableTls(true)
+                .useSelfSignedTlsMaterial(false)
+                .serverHost("localhost")
+                .serverPort(8889)
+                .trustedCertficatePath("C:\\Workspace\\pki\\test\\ca-cert.crt").build();
+        //ClientConfig config = ClientConfig.builder().build();
+        EchoClient client = new EchoClient(config);
+        client.start();
     }
 }
