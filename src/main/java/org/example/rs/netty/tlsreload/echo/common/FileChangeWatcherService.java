@@ -29,9 +29,8 @@ public class FileChangeWatcherService extends Thread {
      */
     private final Consumer<WatchEvent<?>> callback;
 
-    public FileChangeWatcherService(@NonNull String fileToWatch, @NonNull Consumer<WatchEvent<?>> callback,
-                            @NonNull String threadName) {
-        super(threadName);
+    public FileChangeWatcherService(@NonNull String fileToWatch, @NonNull Consumer<WatchEvent<?>> callback) {
+        super();
 
         this.pathOfFileToWatch = Paths.get(fileToWatch);
 
@@ -41,10 +40,6 @@ public class FileChangeWatcherService extends Thread {
         }
         this.callback = callback;
         setUncaughtExceptionHandler(uncaughtExceptionalHandler);
-    }
-
-    public FileChangeWatcherService(@NonNull String fileToWatch, @NonNull Consumer<WatchEvent<?>> callback) {
-        this(fileToWatch, callback, "Thread-name: FileChangeWatcherService");
     }
 
     @Override

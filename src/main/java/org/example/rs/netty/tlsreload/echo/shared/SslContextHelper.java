@@ -26,6 +26,7 @@ public class SslContextHelper {
                 result = SslContextBuilder.forServer(
                         new File(config.getCertificatePath()),
                         new File(config.getKeyPath())).build();
+                //result.
                 log.debug("Done creating SSL Context using supplied material");
             }
         }

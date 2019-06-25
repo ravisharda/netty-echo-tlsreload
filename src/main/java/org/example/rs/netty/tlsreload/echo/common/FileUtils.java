@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 
 public class FileUtils {
 
-    public static String absolutePathOfFileInClasspath (@NonNull String fileLocation) {
+    public static Path pathOfFileInClasspath (@NonNull String fileLocation) {
         Path filePath;
         try {
             filePath = Paths.get(
@@ -16,6 +16,6 @@ public class FileUtils {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return filePath.toAbsolutePath().toString();
+        return filePath;
     }
 }

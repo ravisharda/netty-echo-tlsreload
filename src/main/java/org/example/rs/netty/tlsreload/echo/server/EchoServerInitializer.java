@@ -11,9 +11,13 @@ import org.example.rs.netty.tlsreload.echo.common.FileChangeWatcherService;
 import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
 import org.example.rs.netty.tlsreload.echo.shared.SslContextHelper;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 @RequiredArgsConstructor
 @Slf4j
 public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
+
+    private AtomicBoolean isFileChangeListenerEnabled = new AtomicBoolean(false);
 
     @NonNull
     private final ServerConfig config;
@@ -22,6 +26,7 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
 
     /**
      * This method is called once when the Channel is registered.
+     *
      * @param ch
      * @throws Exception
      */
@@ -41,12 +46,15 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
         log.info("Done adding App handler to the pipeline.");
         log.info(pipeline.toString());
 
-        if (config.isTlsEnabled() && !config.isUseSelfSignedTlsMaterial()) {
+        if (!isFileChangeListenerEnabled.get() && config.isTlsEnabled()
+                && !config.isUseSelfSignedTlsMaterial()) {
+            log.debug("channel: {}", ch.toString());
             FileChangeWatcherService fileWatcher = new FileChangeWatcherService(
                     config.getCertificatePath(),
-                    new TlsConfigChangeEventConsumer(pipeline, ch.alloc(), config));
+                    new TlsConfigChangeEventConsumer(ch, config));
             fileWatcher.setDaemon(true);
             fileWatcher.start();
+            isFileChangeListenerEnabled.set(true);
         }
     }
 }

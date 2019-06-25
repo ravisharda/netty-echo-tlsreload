@@ -26,4 +26,7 @@ public class ClientConfig {
 
     @Builder.Default
     private boolean useSelfSignedTlsMaterial = false;
+
+    @Builder.Default
+    private boolean loggingHandlerEnabled = false;
 }

@@ -9,6 +9,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.example.rs.netty.tlsreload.echo.common.FileChangeWatcherService;
 import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
 
 /**
@@ -19,7 +20,7 @@ import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
  *
  */
 @Slf4j
-public final class EchoServer implements AutoCloseable {
+public final class EchoServer extends Thread {
 
     private final ServerConfig serverConfig;
 
@@ -36,31 +37,6 @@ public final class EchoServer implements AutoCloseable {
         log.info(this.serverConfig.toString());
     }
 
-    public void start() throws InterruptedException {
-        bossGroup = new NioEventLoopGroup(1);
-        workerGroup = new NioEventLoopGroup();
-
-        try {
-            // Configure the server
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-            log.debug("Done creating server bootstrap");
-            serverBootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_BACKLOG, 100)
-                    .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(new EchoServerInitializer(serverConfig));
-
-            // Start the server
-            ChannelFuture f = serverBootstrap.bind(serverConfig.getPort()).sync();
-            log.info("Server started");
-
-            // Wait until the server socket is closed
-            f.channel().closeFuture().sync();
-        } finally {
-            close();
-        }
-    }
-
     public static void main(String... args) throws Exception {
         ServerConfig config = ServerConfig.builder()
                 .port(8889)
@@ -69,12 +45,12 @@ public final class EchoServer implements AutoCloseable {
                 .certificatePath("C:\\Workspace\\pki\\test\\server-cert.crt")
                 .keyPath("C:\\Workspace\\pki\\test\\server-key.key").build();
 
-        try (EchoServer server = new EchoServer(config)) {
-            server.start();
-        }
+        EchoServer server = new EchoServer(config);
+        server.start();
+
+
     }
 
-    @Override
     public void close() {
         log.info("Shutting down event loops");
         if (!bossGroup.isShutdown()) {
@@ -85,6 +61,34 @@ public final class EchoServer implements AutoCloseable {
             if (workerGroup != null) {
                 workerGroup.shutdownGracefully();
             }
+        }
+    }
+
+    @Override
+    public void run() {
+        bossGroup = new NioEventLoopGroup(1);
+        workerGroup = new NioEventLoopGroup();
+
+        try {
+            // Configure the server
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            log.debug("Done creating server bootstrap");
+            serverBootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 100)
+                    //.handler(new LoggingHandler(LogLevel.DEBUG))
+                    .childHandler(new EchoServerInitializer(serverConfig));
+
+            // Start the server
+            ChannelFuture f = serverBootstrap.bind(serverConfig.getPort()).sync();
+            log.info("Server started");
+
+            // Wait until the server socket is closed
+            f.channel().closeFuture().sync();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            close();
         }
     }
 }

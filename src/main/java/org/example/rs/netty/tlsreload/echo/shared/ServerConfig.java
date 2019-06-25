@@ -25,6 +25,9 @@ public class ServerConfig {
     @Builder.Default
     private String keyPath = null;
 
+    @Builder.Default
+    private boolean loggingHandlerEnabled = false;
+
     public static void main(String[] args) {
         System.out.println(ServerConfig.builder().build());
     }

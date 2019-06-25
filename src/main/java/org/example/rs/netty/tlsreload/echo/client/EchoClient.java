@@ -28,7 +28,11 @@ public class EchoClient implements AutoCloseable {
         log.info(this.config.toString());
     }
 
-    public void start() throws InterruptedException, SSLException {
+    public void start() throws SSLException, InterruptedException {
+        start(true);
+    }
+
+    public void start(boolean waitUntilClosed) throws InterruptedException, SSLException {
         // Configure the client.
         group = new NioEventLoopGroup();
         try {
@@ -44,8 +48,10 @@ public class EchoClient implements AutoCloseable {
             log.trace("Done starting the client to connect to server at host {} and port {}",
                     config.getServerHost(), config.getServerPort());
 
-            // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
+            if (waitUntilClosed) {
+                // Wait until the connection is closed.
+                f.channel().closeFuture().sync();
+            }
         } finally {
             close();
         }
