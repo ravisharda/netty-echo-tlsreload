@@ -4,11 +4,10 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.net.ssl.SSLException;
 import java.io.File;
 import java.security.cert.CertificateException;
+import javax.net.ssl.SSLException;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SslContextHelper {

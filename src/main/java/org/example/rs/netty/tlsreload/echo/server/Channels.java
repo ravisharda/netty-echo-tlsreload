@@ -10,11 +10,11 @@ public class Channels {
     private static final ChannelGroup channels =
             new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    public synchronized static ChannelGroup get() {
+    public static synchronized ChannelGroup get() {
         return channels;
     }
 
-    public synchronized static void add(Channel ch) {
+    public static synchronized void add(Channel ch) {
         channels.add(ch);
     }
 }

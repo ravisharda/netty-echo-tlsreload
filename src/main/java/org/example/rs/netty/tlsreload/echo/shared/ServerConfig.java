@@ -1,6 +1,5 @@
 package org.example.rs.netty.tlsreload.echo.shared;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -27,8 +26,4 @@ public class ServerConfig {
 
     @Builder.Default
     private boolean loggingHandlerEnabled = false;
-
-    public static void main(String[] args) {
-        System.out.println(ServerConfig.builder().build());
-    }
 }

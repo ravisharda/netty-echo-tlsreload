@@ -6,10 +6,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
+import javax.net.ssl.SSLException;
 import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
 import org.example.rs.netty.tlsreload.echo.shared.SslContextHelper;
-
-import javax.net.ssl.SSLException;
 
 public class EchoClientInitializer extends ChannelInitializer<SocketChannel> {
     private final ClientConfig config;
@@ -26,7 +25,7 @@ public class EchoClientInitializer extends ChannelInitializer<SocketChannel> {
         if (sslCtx != null) {
             p.addLast(sslCtx.newHandler(ch.alloc(), config.getServerHost(), config.getServerPort()));
         }
-        //p.addLast(new LoggingHandler(LogLevel.INFO));
+        p.addLast(new LoggingHandler(LogLevel.WARN));
         p.addLast(new EchoClientHandler());
     }
 }

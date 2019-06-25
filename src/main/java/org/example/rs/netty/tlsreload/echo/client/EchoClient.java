@@ -8,11 +8,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.CharsetUtil;
+import java.util.concurrent.ExecutionException;
+import javax.net.ssl.SSLException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
-
-import javax.net.ssl.SSLException;
-import java.util.concurrent.ExecutionException;
 
 @Slf4j
 public class EchoClient implements AutoCloseable {

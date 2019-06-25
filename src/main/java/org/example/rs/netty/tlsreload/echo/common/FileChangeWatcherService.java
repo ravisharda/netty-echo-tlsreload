@@ -1,8 +1,5 @@
 package org.example.rs.netty.tlsreload.echo.common;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -12,6 +9,9 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.function.Consumer;
+
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Used for monitoring changes to a file, and performing a specified action when such events occur.
@@ -43,7 +43,7 @@ public class FileChangeWatcherService extends Thread {
     }
 
     @Override
-    @SuppressWarnings( "SleepWhileInLoop" )
+    @SuppressWarnings("SleepWhileInLoop")
     public void run() {
 
         WatchKey watchKey = null;
@@ -68,8 +68,9 @@ public class FileChangeWatcherService extends Thread {
                 //watchService.poll(1, TimeUnit.MINUTES);
                 log.debug("Done setting up watch key.");
 
-                // Looks odd, right? Using the logic or de-duplicating file change events, as suggested by
-                // some here: https://stackoverflow.com/questions/16777869/java-7-watchservice-ignoring-multiple-occurrences-of-the-same-event
+                // Looks odd, right? Using the logic or de-duplicating file change events, as suggested by some here:
+                // https://stackoverflow.com/questions/16777869/java-7-watchservice-ignoring-multiple-occurrences-of-
+                // the-same-event
                 Thread.sleep(200);
 
                 // The watchKey is now in ready state

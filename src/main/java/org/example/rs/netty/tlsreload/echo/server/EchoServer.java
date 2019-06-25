@@ -91,7 +91,7 @@ public final class EchoServer extends Thread {
             // Wait until the server socket is closed
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             close();
         } finally {
             close();

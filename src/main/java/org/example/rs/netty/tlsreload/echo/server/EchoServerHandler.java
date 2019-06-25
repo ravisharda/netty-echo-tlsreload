@@ -27,7 +27,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        log.debug("Server received: {}", ((ByteBuf)msg).toString(CharsetUtil.UTF_8));
+        log.debug("Server received: {}.", ((ByteBuf) msg).toString(CharsetUtil.UTF_8));
         ctx.writeAndFlush(msg);
         //ctx.write(msg);
     }
@@ -60,7 +60,6 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
         log.warn(cause.getMessage(), cause);
 
         // Close the connection when an exception is raised
-        cause.printStackTrace();
         ctx.close();
     }
 }

@@ -1,10 +1,9 @@
 package org.example.rs.netty.tlsreload.echo.common;
 
-import lombok.NonNull;
-
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import lombok.NonNull;
 
 public class FileUtils {
 
