@@ -44,6 +44,6 @@
         <!--<appender-ref ref="FILE-SERVER"/>-->
     </logger>
 
-    <logger name="io.netty" level="INFO"/>
+    <logger name="io.netty" level="WARN"/>
 
 </configuration>
