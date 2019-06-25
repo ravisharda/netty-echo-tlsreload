@@ -1,9 +1,6 @@
 package org.example.rs.netty.tlsreload.echo.server;
 
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.ChannelPipeline;
-
-import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.group.ChannelGroup;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +21,14 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
      */
     public static AtomicInteger countOfEventsConsumed = new AtomicInteger(0);
 
-    private final @NonNull SocketChannel channel;
+    //private final @NonNull SocketChannel channel;
     private final @NonNull ServerConfig config;
 
     @Override
     public void accept(WatchEvent<?> watchEvent) {
         log.debug("Invoked for [{}]", watchEvent.context().toString());
-        log.debug("channel: {}", this.channel.toString());
-        log.debug("channel pipeline: {}", this.channel.pipeline());
+        //log.debug("channel: {}", this.channel.toString());
+        //log.debug("channel pipeline: {}", this.channel.pipeline());
         handleTlsConfigChange();
     }
 
@@ -40,10 +37,27 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
 
         // Each channel has its own pipeline it is created automatically when a new channel is created.
         // Src: https://netty.io/4.0/api/io/netty/channel/ChannelPipeline.html
-        ChannelPipeline pipeline = channel.pipeline();
-        log.info("Pipeline before handling the change: [{}].", pipeline);
+        //ChannelPipeline pipeline = channel.pipeline();
+        //log.info("Pipeline before handling the change: [{}].", pipeline);
+
+        ChannelGroup channels = Channels.get();
+        channels.stream().filter(c -> c.isRegistered() && c.pipeline().get("ssl") != null)
+                .forEach(c -> {
+                    try {
+                        c.pipeline().replace("ssl",
+                                "ssl", SslContextHelper.createServerSslContext(config)
+                                        .newHandler(c.alloc()));
+                        log.info("Done replacing SSL Context handler.");
+                        log.info("Pipeline after handling the change: [{}].", c.pipeline());
+                    } catch (CertificateException | SSLException e) {
+                        log.warn(e.getMessage(), e);
+                        c.close();
+                    }
+                });
+
+        /*
         try {
-            if (pipeline.get("ssl") != null) {
+            if (channel.isRegistered()) {
                 pipeline.replace("ssl",
                         "ssl", SslContextHelper.createServerSslContext(config)
                                 .newHandler(channel.alloc()));
@@ -55,6 +69,6 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
         }  catch (CertificateException | SSLException e) {
             log.warn(e.getMessage(), e);
             throw new RuntimeException(e);
-        }
+        }*/
     }
 }

@@ -26,7 +26,7 @@ public class EchoClientInitializer extends ChannelInitializer<SocketChannel> {
         if (sslCtx != null) {
             p.addLast(sslCtx.newHandler(ch.alloc(), config.getServerHost(), config.getServerPort()));
         }
-        p.addLast(new LoggingHandler(LogLevel.INFO));
+        //p.addLast(new LoggingHandler(LogLevel.INFO));
         p.addLast(new EchoClientHandler());
     }
 }

@@ -6,8 +6,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.common.FileChangeWatcherService;
 import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
@@ -37,7 +35,7 @@ public final class EchoServer extends Thread {
         log.info(this.serverConfig.toString());
     }
 
-    public static void main(String... args) throws Exception {
+    public static void main(String... args) {
         ServerConfig config = ServerConfig.builder()
                 .port(8889)
                 .tlsEnabled(true)
@@ -47,8 +45,6 @@ public final class EchoServer extends Thread {
 
         EchoServer server = new EchoServer(config);
         server.start();
-
-
     }
 
     public void close() {
@@ -83,10 +79,20 @@ public final class EchoServer extends Thread {
             ChannelFuture f = serverBootstrap.bind(serverConfig.getPort()).sync();
             log.info("Server started");
 
+            if (serverConfig.isTlsEnabled() && !serverConfig.isUseSelfSignedTlsMaterial()) {
+                // log.debug("channel: {}", ch.toString());
+                FileChangeWatcherService fileWatcher = new FileChangeWatcherService(
+                        serverConfig.getCertificatePath(),
+                        new TlsConfigChangeEventConsumer(serverConfig));
+                fileWatcher.setDaemon(true);
+                fileWatcher.start();
+            }
+
             // Wait until the server socket is closed
             f.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            close();
         } finally {
             close();
         }

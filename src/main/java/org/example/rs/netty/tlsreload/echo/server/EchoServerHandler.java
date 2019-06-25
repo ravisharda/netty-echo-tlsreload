@@ -1,8 +1,10 @@
 package org.example.rs.netty.tlsreload.echo.server;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -12,6 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelRegistered();
+    }
+
     /**
      * This method is invoked for each incoming message.
      *
@@ -20,9 +27,9 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        log.debug("Server received: {}", ((ByteBuf)msg).toString(CharsetUtil.UTF_8));
         ctx.writeAndFlush(msg);
         //ctx.write(msg);
-
     }
 
     /**
@@ -34,6 +41,12 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     public void channelReadComplete(ChannelHandlerContext ctx) {
         // Flush pending messages to the remote peer and close the channel.
         ctx.flush();
+    }
+
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        log.debug("Unregistering the channel: {}.", ctx.channel());
+        ctx.fireChannelUnregistered();
     }
 
     /**

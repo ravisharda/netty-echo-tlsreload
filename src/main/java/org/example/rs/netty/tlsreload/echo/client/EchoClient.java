@@ -1,15 +1,18 @@
 package org.example.rs.netty.tlsreload.echo.client;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
 
 import javax.net.ssl.SSLException;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 public class EchoClient implements AutoCloseable {
@@ -28,11 +31,11 @@ public class EchoClient implements AutoCloseable {
         log.info(this.config.toString());
     }
 
-    public void start() throws SSLException, InterruptedException {
+    public void start() throws SSLException, InterruptedException, ExecutionException {
         start(true);
     }
 
-    public void start(boolean waitUntilClosed) throws InterruptedException, SSLException {
+    public void start(boolean waitUntilClosed) throws InterruptedException, SSLException, ExecutionException {
         // Configure the client.
         group = new NioEventLoopGroup();
         try {
@@ -48,6 +51,14 @@ public class EchoClient implements AutoCloseable {
             log.trace("Done starting the client to connect to server at host {} and port {}",
                     config.getServerHost(), config.getServerPort());
 
+            //f.sync().get();
+            ChannelFuture writeFuture = f.channel().writeAndFlush(
+                    Unpooled.copiedBuffer("\nWhat's your name?", CharsetUtil.UTF_8));
+
+            // Waiting for the write to complete.
+            //writeFuture.await();
+            //f.channel().close();
+
             if (waitUntilClosed) {
                 // Wait until the connection is closed.
                 f.channel().closeFuture().sync();
@@ -57,7 +68,7 @@ public class EchoClient implements AutoCloseable {
         }
     }
 
-    public static void main(String[] args) throws SSLException, InterruptedException {
+    public static void main(String[] args) throws SSLException, InterruptedException, ExecutionException {
         ClientConfig config = ClientConfig.builder()
                 .enableTls(true)
                 .useSelfSignedTlsMaterial(false)
