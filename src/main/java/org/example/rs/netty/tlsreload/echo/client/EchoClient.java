@@ -9,12 +9,14 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.CharsetUtil;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.net.ssl.SSLException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
 
 @Slf4j
-public class EchoClient implements AutoCloseable {
+public class EchoClient implements Runnable {
 
     private final ClientConfig config;
 
@@ -25,11 +27,7 @@ public class EchoClient implements AutoCloseable {
         log.info(this.config.toString());
     }
 
-    public void start() throws SSLException, InterruptedException, ExecutionException {
-        start(true);
-    }
-
-    public void start(boolean waitUntilClosed) throws InterruptedException, SSLException, ExecutionException {
+    public void run() {
         // Configure the client.
         group = new NioEventLoopGroup();
         try {
@@ -53,16 +51,15 @@ public class EchoClient implements AutoCloseable {
             //writeFuture.await();
             //f.channel().close();
 
-            if (waitUntilClosed) {
-                // Wait until the connection is closed.
-                f.channel().closeFuture().sync();
-            }
+            // Wait until the connection is closed.
+            f.channel().closeFuture().sync();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             close();
         }
     }
 
-    @Override
     public void close() {
         log.debug("Shutting down client event loop");
 
@@ -81,6 +78,7 @@ public class EchoClient implements AutoCloseable {
                 .trustedCertficatePath("C:\\Workspace\\pki\\test\\ca-cert.crt").build();
         //ClientConfig config = ClientConfig.builder().build();
         EchoClient client = new EchoClient(config);
-        client.start();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(client);
     }
 }
