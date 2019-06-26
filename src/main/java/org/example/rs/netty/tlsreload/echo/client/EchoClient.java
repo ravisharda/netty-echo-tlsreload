@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.net.ssl.SSLException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.rs.netty.tlsreload.echo.common.FileUtils;
 import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
 
 @Slf4j
@@ -75,8 +76,10 @@ public class EchoClient implements Runnable {
                 .useSelfSignedTlsMaterial(false)
                 .serverHost("localhost")
                 .serverPort(8889)
-                .trustedCertficatePath("C:\\Workspace\\pki\\test\\ca-cert.crt").build();
+                .trustedCertficatePath(FileUtils.pathOfFileInClasspath("ca-cert.crt").toString()).build();
+                //.trustedCertficatePath("C:\\Workspace\\pki\\test\\ca-cert.crt").build();
         //ClientConfig config = ClientConfig.builder().build();
+
         EchoClient client = new EchoClient(config);
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(client);

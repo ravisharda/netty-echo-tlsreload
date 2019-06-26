@@ -6,6 +6,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.common.FileChangeWatcherService;
 import org.example.rs.netty.tlsreload.echo.common.FileUtils;
@@ -89,8 +91,11 @@ public final class EchoServer extends Thread {
                 .useSelfSignedTlsMaterial(false)
                 .certificatePath(FileUtils.pathOfFileInClasspath("server-cert.crt").toString())
                 .keyPath(FileUtils.pathOfFileInClasspath("server-key.key").toString())
+                //.certificatePath("C:\\Workspace\\pki\\test\\server-cert.crt")
+                //.keyPath("C:\\Workspace\\pki\\test\\server-key.key")
                 .build();
         EchoServer server = new EchoServer(config);
-        server.start();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(server);
     }
 }
