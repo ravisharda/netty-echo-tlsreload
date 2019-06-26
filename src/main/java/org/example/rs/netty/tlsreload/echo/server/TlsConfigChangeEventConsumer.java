@@ -25,7 +25,7 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
      * A counter representing the number of times this object has been asked to
      * consume an event.
      */
-    public static AtomicInteger countOfEventsConsumed = new AtomicInteger(0);
+    private static final AtomicInteger countOfEventsConsumed = new AtomicInteger(0);
 
     //private final @NonNull SocketChannel channel;
     private final @NonNull ServerConfig config;
