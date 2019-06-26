@@ -24,7 +24,7 @@ public class EchoClientHandler
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, ByteBuf in) {
-        log.debug("Client received: ", in.toString(CharsetUtil.UTF_8));
+        log.debug("Client received: {}", in.toString(CharsetUtil.UTF_8));
         // Prints the received message
     }
 
