@@ -2,6 +2,7 @@ package org.example.rs.netty.tlsreload.echo.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -36,24 +37,35 @@ public class EchoClient implements Runnable {
             log.debug("Done creating client bootstrap");
             b.group(group)
                     .channel(NioSocketChannel.class)
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
                     .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new EchoClientInitializer(config));
 
-            // Start the client.
-            ChannelFuture f = b.connect(config.getServerHost(), config.getServerPort()).sync();
-            log.trace("Done starting the client to connect to server at host {} and port {}",
-                    config.getServerHost(), config.getServerPort());
+            ChannelFuture chFuture = b.connect(config.getServerHost(), config.getServerPort());
 
-            //f.sync().get();
-            ChannelFuture writeFuture = f.channel().writeAndFlush(
-                    Unpooled.copiedBuffer("\nWhat's your name?", CharsetUtil.UTF_8));
+            // We are using await() here instead of sync(). Both block the current thread but sync() will rethrow the
+            // failure if this future failed, while await() will not. We want to have control over what message gets
+            // logged and when. We do the opposite when we write the message below.
+            chFuture.awaitUninterruptibly();
+            Channel channel = chFuture.channel();
 
-            // Waiting for the write to complete.
-            //writeFuture.await();
-            //f.channel().close();
-
-            // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
+            assert chFuture.isDone();
+            if (chFuture.isCancelled()) {
+                log.info("Connection cancelled by user.");
+            } else if (!chFuture.isSuccess()) {
+                Throwable e = chFuture.cause();
+                log.warn(e.getMessage(), e);
+            } else {
+                // Connection established successfully. Now, write the message(s).
+                for (int i = 1; i < 51; i++) {
+                    channel.writeAndFlush(Unpooled.copiedBuffer("Ping no. " + i, CharsetUtil.UTF_8)).sync();
+                    Thread.sleep(2 * 1000);
+                }
+            }
+            // Wait for 10 more seconds
+            Thread.sleep(10 * 1000);
+            channel.close();
+            // channel.closeFuture().sync();
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
