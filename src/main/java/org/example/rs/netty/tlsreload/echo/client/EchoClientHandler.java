@@ -59,7 +59,8 @@ public class EchoClientHandler
     /**
      * Invoked when the Channel of the ChannelHandlerContext was unregistered from its EventLoop.
      *
-     * From https://stackoverflow.com/questions/35822638/understanding-channelregistered-in-netty-4-when-could-a-channel-be-re-registere
+     * From: https://stackoverflow.com/questions/35822638/understanding-channelregistered-in-netty-4-
+     * when-could-a-channel-be-re-registere
      *
      * "When you deregister a Channel it basically removed itself from the servicing Thread which in
      * the case of NIO also is the Selector itself. This means you will not get notified on any event

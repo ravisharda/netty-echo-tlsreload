@@ -71,13 +71,18 @@ public class EchoClient implements Runnable {
     }
 
     public static void main(String[] args) throws SSLException, InterruptedException, ExecutionException {
+
+        // You'll see that the trustedCertificatePath is set twice. The first call is redundant, but we
+        // leave it here so that it is easy to switch context without failing any checkstyle rules. To switch context
+        // just change the order of the statement.
         ClientConfig config = ClientConfig.builder()
                 .enableTls(true)
                 .useSelfSignedTlsMaterial(false)
                 .serverHost("localhost")
                 .serverPort(8889)
-                .trustedCertficatePath(FileUtils.pathOfFileInClasspath("ca-cert.crt").toString()).build();
-                //.trustedCertficatePath("C:\\Workspace\\pki\\test\\ca-cert.crt").build();
+                .trustedCertficatePath(FileUtils.pathOfFileInClasspath("ca-cert.crt").toString())
+                .trustedCertficatePath("C:\\Workspace\\pki\\test\\ca-cert.crt")
+                .build();
         //ClientConfig config = ClientConfig.builder().build();
 
         EchoClient client = new EchoClient(config);
