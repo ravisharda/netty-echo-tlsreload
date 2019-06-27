@@ -7,6 +7,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 
 public class Channels {
 
+    // See info about ChannelGroups here: https://netty.io/4.1/api/io/netty/channel/group/ChannelGroup.html
     private static final ChannelGroup channels =
             new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 

@@ -16,7 +16,14 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        log.debug("Channel {} is registered.", ctx.channel());
         ctx.fireChannelRegistered();
+    }
+
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        log.debug("Channel {} is unregistered.", ctx.channel());
+        ctx.fireChannelUnregistered();
     }
 
     /**
@@ -27,9 +34,11 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        log.debug("Server received: {}.", ((ByteBuf) msg).toString(CharsetUtil.UTF_8));
+        log.info("Server received: {}.", ((ByteBuf) msg).toString(CharsetUtil.UTF_8));
+
+        // Since Netty 4.0, write() does not flush automatically. A write() must be followed by a flush() to do that.
+        // Using the shortcut method here.
         ctx.writeAndFlush(msg);
-        //ctx.write(msg);
     }
 
     /**
@@ -39,15 +48,13 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
-        // Flush pending messages to the remote peer and close the channel.
+        log.debug("Channel read for channel {} complete.", ctx.channel());
+
+        // Flush any pending messages to the remote peer and close the channel.
         ctx.flush();
     }
 
-    @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        log.debug("Unregistering the channel: {}.", ctx.channel());
-        ctx.fireChannelUnregistered();
-    }
+
 
     /**
      * Called if an exception is thrown during the read operation.
