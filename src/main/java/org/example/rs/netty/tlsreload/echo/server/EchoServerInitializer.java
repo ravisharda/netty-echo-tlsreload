@@ -36,7 +36,8 @@ public class EchoServerInitializer extends ChannelInitializer<SocketChannel> {
             pipeline.addLast("ssl", sslCtx.newHandler(ch.alloc()));
             log.info("Done adding SSL Context handler to the pipeline.");
         }
-        pipeline.addLast("logging", new LoggingHandler(LogLevel.INFO));
+        pipeline.addLast("logHandler", new LoggingHandler(LogLevel.INFO));
+        pipeline.remove("logHandler"); // Comment this line if you do want the log handler to be used.
         pipeline.addLast("app", new EchoServerHandler()); // business logic handler.
         log.info("Done adding App handler to the pipeline.");
         log.info(pipeline.toString());
