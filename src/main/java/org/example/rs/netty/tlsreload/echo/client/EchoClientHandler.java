@@ -38,11 +38,7 @@ public class EchoClientHandler
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        log.debug("Channel [{}] is active.", ctx.channel());
-
-        // When notified that the channel is active, send a hello message.
-        ctx.writeAndFlush(Unpooled.copiedBuffer("\nHello, there!",
-                CharsetUtil.UTF_8));
+        log.debug("Channel [{}] is in-active.", ctx.channel());
     }
 
     /**
