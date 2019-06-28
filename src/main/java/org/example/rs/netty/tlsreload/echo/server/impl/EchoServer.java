@@ -1,4 +1,4 @@
-package org.example.rs.netty.tlsreload.echo.server;
+package org.example.rs.netty.tlsreload.echo.server.impl;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -6,11 +6,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.common.FileChangeWatcherService;
-import org.example.rs.netty.tlsreload.echo.common.FileUtils;
 import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
 
 /**
@@ -69,7 +66,8 @@ public final class EchoServer extends Thread {
                 // Register a file watcher
                 FileChangeWatcherService fileWatcher = new FileChangeWatcherService(
                         serverConfig.getCertificatePath(),
-                        new TlsConfigChangeEventConsumer(serverConfig));
+                        i -> Channels.flushStopAndRefresh());
+                        //new TlsConfigChangeEventConsumer(serverConfig));
                 fileWatcher.setDaemon(true);
                 fileWatcher.start();
             }
@@ -84,21 +82,5 @@ public final class EchoServer extends Thread {
         }
     }
 
-    public static void main(String... args) {
-        // You'll see that the certificatePath and keyPath are set twice. The first set of calls are redundant, but we
-        // leave it here so that it is easy to switch context without failing any checkstyle rules. To switch context
-        // just change the order.
-        ServerConfig config = ServerConfig.builder()
-                .port(8889)
-                .tlsEnabled(true)
-                .useSelfSignedTlsMaterial(false)
-                .certificatePath(FileUtils.pathOfFileInClasspath("server-cert.crt").toString())
-                .keyPath(FileUtils.pathOfFileInClasspath("server-key.key").toString())
-                .certificatePath("C:\\Workspace\\pki\\test\\server-cert.crt")
-                .keyPath("C:\\Workspace\\pki\\test\\server-key.key")
-                .build();
-        EchoServer server = new EchoServer(config);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(server);
-    }
+
 }

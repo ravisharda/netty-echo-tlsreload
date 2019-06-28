@@ -3,9 +3,9 @@ package org.example.rs.netty.tlsreload.echo;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.example.rs.netty.tlsreload.echo.client.EchoClient;
+import org.example.rs.netty.tlsreload.echo.client.impl.EchoClient;
 import org.example.rs.netty.tlsreload.echo.common.FileUtils;
-import org.example.rs.netty.tlsreload.echo.server.EchoServer;
+import org.example.rs.netty.tlsreload.echo.server.impl.EchoServer;
 import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
 import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
 import org.junit.Test;

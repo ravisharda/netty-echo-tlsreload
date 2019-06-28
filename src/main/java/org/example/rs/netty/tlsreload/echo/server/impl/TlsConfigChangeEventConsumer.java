@@ -1,19 +1,13 @@
-package org.example.rs.netty.tlsreload.echo.server;
-
-import io.netty.channel.group.ChannelGroup;
+package org.example.rs.netty.tlsreload.echo.server.impl;
 
 import java.nio.file.WatchEvent;
-import java.security.cert.CertificateException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-
-import javax.net.ssl.SSLException;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.shared.ServerConfig;
-import org.example.rs.netty.tlsreload.echo.shared.SslContextHelper;
 
 /**
  * Handles the TLS config change event by performing the necessary actions.
@@ -41,7 +35,8 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
 
         // Each channel has its own pipeline it is created automatically when a new channel is created.
         // Src: https://netty.io/4.0/api/io/netty/channel/ChannelPipeline.html
-        ChannelGroup channels = Channels.get();
+        Channels.flushStopAndRefresh();
+        /*
         channels.stream()
                 // We don't care about channels that are not registered and channels that don't already have
                 // a handler with name "ssl".
@@ -49,6 +44,7 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
                 .forEach(c -> {
                     try {
                         log.info("Pipeline before handling the change: [{}].", c.pipeline());
+
                         c.pipeline().replace("ssl",
                                 "ssl", SslContextHelper.createServerSslContext(config)
                                         .newHandler(c.alloc()));
@@ -58,6 +54,6 @@ public class TlsConfigChangeEventConsumer implements Consumer<WatchEvent<?>> {
                         log.warn(e.getMessage(), e);
                         c.close();
                     }
-                });
+                });*/
     }
 }

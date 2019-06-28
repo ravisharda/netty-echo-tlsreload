@@ -1,4 +1,4 @@
-package org.example.rs.netty.tlsreload.echo.server;
+package org.example.rs.netty.tlsreload.echo.server.impl;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

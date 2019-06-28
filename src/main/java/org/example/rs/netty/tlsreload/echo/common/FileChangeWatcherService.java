@@ -81,7 +81,10 @@ public class FileChangeWatcherService extends Thread {
                             .stream()
                             .filter(event -> // we only care about changes to the specified file.
                                     event.context().toString().contains(fileName))
-                            .forEach(event ->  callback.accept(event)); // invoke the specified callback
+                            .forEach(event ->  {
+                                log.debug("Encountered change in watched file.");
+                                callback.accept(event);
+                            }); // invoke the specified callback
                 }
 
                 boolean isKeyValid = watchKey.reset();

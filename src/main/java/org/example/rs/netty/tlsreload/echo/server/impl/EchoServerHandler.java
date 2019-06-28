@@ -1,4 +1,4 @@
-package org.example.rs.netty.tlsreload.echo.server;
+package org.example.rs.netty.tlsreload.echo.server.impl;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
