@@ -1,16 +1,16 @@
 package org.example.rs.netty.tlsreload.echo.client.impl;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
+
+import java.util.function.Consumer;
 
 @Slf4j
 public class EchoClient implements Runnable {
@@ -18,10 +18,18 @@ public class EchoClient implements Runnable {
     private final ClientConfig config;
 
     private EventLoopGroup group;
+    private Consumer<Channel> callback;
+    private int waittimeBeforecloseInSeconds = 10;
 
-    public EchoClient(ClientConfig config) {
+    public EchoClient(ClientConfig config, Consumer<Channel> callback) {
+        this(config, callback, 10);
+    }
+
+    public EchoClient(ClientConfig config, Consumer<Channel> callback, int waittimeBeforecloseInSeconds) {
         this.config = config;
         log.info(this.config.toString());
+        this.callback = callback;
+        this.waittimeBeforecloseInSeconds = waittimeBeforecloseInSeconds;
     }
 
     public void run() {
@@ -51,15 +59,9 @@ public class EchoClient implements Runnable {
                 Throwable e = chFuture.cause();
                 log.warn(e.getMessage(), e);
             } else {
-                // Connection established successfully. Now, write the message(s).
-                for (int i = 1; i < 51; i++) {
-                    channel.writeAndFlush(Unpooled.copiedBuffer("Ping no. " + i, CharsetUtil.UTF_8)).sync();
-
-                    Thread.sleep(2 * 1000);
-                }
+                this.callback.accept(channel);
             }
-            // Wait for 10 more seconds
-            Thread.sleep(10 * 1000);
+            Thread.sleep(waittimeBeforecloseInSeconds * 1000);
             channel.close();
             // channel.closeFuture().sync();
         } catch (Exception e) {

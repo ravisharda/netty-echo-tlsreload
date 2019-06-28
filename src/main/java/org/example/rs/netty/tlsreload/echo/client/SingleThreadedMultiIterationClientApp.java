@@ -1,13 +1,16 @@
 package org.example.rs.netty.tlsreload.echo.client;
 
-import org.example.rs.netty.tlsreload.echo.client.impl.EchoClient;
-import org.example.rs.netty.tlsreload.echo.common.FileUtils;
-import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
+import io.netty.buffer.Unpooled;
+import io.netty.util.CharsetUtil;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SingleThreadedClientApp {
+import org.example.rs.netty.tlsreload.echo.client.impl.EchoClient;
+import org.example.rs.netty.tlsreload.echo.common.FileUtils;
+import org.example.rs.netty.tlsreload.echo.shared.ClientConfig;
+
+public class SingleThreadedMultiIterationClientApp {
 
     public static void main(String[] args) {
 
@@ -24,7 +27,22 @@ public class SingleThreadedClientApp {
                 .build();
         //ClientConfig config = ClientConfig.builder().build();
 
-        EchoClient client = new EchoClient(config);
+        EchoClient client = new EchoClient(config, channel -> {
+            // Connection established successfully. Now, write the message(s).
+            for (int i = 1; i < 51; i++) {
+                try {
+                    channel.writeAndFlush(Unpooled.copiedBuffer("Ping no. " + i, CharsetUtil.UTF_8)).sync();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    Thread.sleep(2 * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(client);
     }
